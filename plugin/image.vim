@@ -13,6 +13,9 @@ let g:image_frame = 0
 
 function! DisplayImage()
 set nowrap
+set nonumber
+set norelativenumber
+set buftype=nofile
 
 if !exists('g:imagefile')
     let g:imagefile = expand('%:p')
