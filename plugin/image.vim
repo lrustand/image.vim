@@ -31,7 +31,7 @@ def getAsciiImage(imageFile, maxWidth, maxHeight):
 
     if imageFile.endswith(".gif"):
         img.seek(int(vim.eval("g:image_frame")))
-        img = img.convert("RGB")
+        img = img.convert("RGBA")
 
     # We want to stretch the image a little wide to compensate for
     # the rectangular/taller shape of fonts.
