@@ -80,8 +80,8 @@ def getAsciiImage(imageFile, maxWidth, maxHeight):
 
     if frame == 0:
         vim.command("noswapfile ene")
-        vim.command("bd! #")
         vim.command("file! img://" + imageFile)
+        vim.command("set bufhidden=wipe")
 
     # clear the buffer
     vim.current.buffer[:] = None
