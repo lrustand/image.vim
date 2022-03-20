@@ -55,6 +55,7 @@ def getAsciiImage(imageFile, maxWidth, maxHeight):
 
     mycolorpalette = {}
     matches = []
+    vim.command("hi Transparent guifg=default guibg=default")
     for y in range(scaledHeight):
         asciiImage = ""
         for x in range(scaledWidth):
@@ -62,18 +63,23 @@ def getAsciiImage(imageFile, maxWidth, maxHeight):
             if not isinstance(rgb, tuple):
                 rgb = (rgb,)
 
-            rgbstring = '#%02x%02x%02x' % (rgb[0], rgb[1], rgb[2])
-            if rgbstring not in mycolorpalette:
-                rgbcolor = "RGBColor" + str(len(mycolorpalette))
-                mycolorpalette[rgbstring] = rgbcolor
-                vim.command("hi " + rgbcolor + " guifg=" + rgbstring+ " guibg=" + rgbstring)
+            alpha = 255
+            if len(rgb) == 4:
+                alpha = rgb[3]
+
+            if alpha == 0:
+                colorname = "Transparent"
             else:
-                rgbcolor = mycolorpalette[rgbstring]
-            vim.command('call matchadd("' + rgbcolor + '",' + " '\\%" + str(y + 2) + "l\\%" + str(x + 1) + "c')")
+                rgbstring = '#%02x%02x%02x' % (rgb[0], rgb[1], rgb[2])
+                if rgbstring not in mycolorpalette:
+                    colorname = "RGBColor" + str(len(mycolorpalette))
+                    mycolorpalette[rgbstring] = colorname
+                    vim.command("hi " + colorname + " guifg=" + rgbstring+ " guibg=" + rgbstring)
+                else:
+                    colorname = mycolorpalette[rgbstring]
+            vim.command('call matchadd("' + colorname + '",' + " '\\%" + str(y + 2) + "l\\%" + str(x + 1) + "c')")
             asciiImage += colorPalette[int(sum(rgb) / len(rgb) / 256 * lencolor)]
         vim.current.buffer.append(asciiImage)
-
-    return asciiImage
 
 vim.command("let imagefile = expand('%:p')")
 imagefile = vim.eval("imagefile")
