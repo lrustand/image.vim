@@ -5,18 +5,23 @@ if !has("python")
     finish
 endif
 
-au BufRead *.png,*.jpg,*.jpeg,*.gif :call DisplayImage()
-au VimResized *.png,*.jpg,*.jpeg,*.gif :call DisplayImage()
+au BufWinEnter,VimResized,WinEnter *.png,*.jpg,*.jpeg,*.gif :call DisplayImage()
 au QuitPre *.png,*.jpg,*.jpeg,*.gif :call CloseImage()
 au CursorHold *.gif :call DisplayImage()
+au BufHidden *.png,*.jpg,*.jpeg,*.gif :call ResetVars()
 au BufLeave,WinLeave *.png,*.jpg,*.jpeg,*.gif exe "set updatetime=".g:original_updatetime
 
-let g:image_frame = 0
 let g:original_updatetime = &updatetime
 function! CloseImage()
+    call clearmatches()
     bd!
-    unlet g:imagefile
-    let g:image_frame = 0
+    let w:image_frame = 0
+    exe "set updatetime=".g:original_updatetime
+endfunction
+
+function! ResetVars()
+    call clearmatches()
+    let w:image_frame = 0
     exe "set updatetime=".g:original_updatetime
 endfunction
 
@@ -25,9 +30,10 @@ set nowrap
 set nonumber
 set norelativenumber
 set buftype=nofile
+set noswapfile
 
-if !exists('g:imagefile')
-    let g:imagefile = expand('%:p')
+if !exists('w:image_frame')
+    let w:image_frame = 0
 endif
 
 python << EOF
@@ -41,12 +47,13 @@ def getAsciiImage(imageFile, maxWidth, maxHeight):
     except:
         exit("Cannot open image %s" % imageFile)
 
-    frame = int(vim.eval("g:image_frame"))
+    frame = int(vim.eval("w:image_frame"))
+
     if imageFile.endswith(".gif"):
         try:
             img.seek(frame)
         except EOFError:
-            vim.command("let g:image_frame = 0")
+            vim.command("let w:image_frame = 0")
             frame = 0
             img.seek(0)
         img = img.convert("RGBA")
@@ -84,8 +91,6 @@ def getAsciiImage(imageFile, maxWidth, maxHeight):
     # cannot save this
 
     if frame == 0:
-        vim.command("noswapfile ene")
-        vim.command("file! img://" + imageFile)
         vim.command("set bufhidden=wipe")
 
     # clear the buffer
@@ -110,7 +115,7 @@ def getAsciiImage(imageFile, maxWidth, maxHeight):
             else:
                 rgbstring = '#%02x%02x%02x' % (rgb[0], rgb[1], rgb[2])
                 if rgbstring not in mycolorpalette:
-                    colorname = "RGBColor" + str(len(mycolorpalette))
+                    colorname = "RGBColor" + rgbstring[1:]
                     mycolorpalette[rgbstring] = colorname
                     vim.command("hi " + colorname + " guifg=" + rgbstring+ " guibg=" + rgbstring)
                 else:
@@ -122,7 +127,7 @@ def getAsciiImage(imageFile, maxWidth, maxHeight):
                 asciiImage += colorPalette[int(sum(rgb) / len(rgb) / 256 * lencolor)]
         vim.current.buffer.append(asciiImage)
 
-imagefile = vim.eval("g:imagefile")
+imagefile = vim.eval("expand('%:p')")
 
 width = vim.current.window.width
 height = vim.current.window.height
@@ -131,5 +136,5 @@ getAsciiImage(imagefile, width, height)
 
 EOF
 
-let g:image_frame += 1
+let w:image_frame += 1
 endfunction
