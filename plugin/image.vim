@@ -63,18 +63,20 @@ def getAsciiImage(imageFile, maxWidth, maxHeight):
     lencolor = len(colorPalette)
 
     # Delete the current buffer so that we dont overwrite the real image file
-    vim.command("bd!")
     # get a new buffer
     # enew is safe enough since we did not specified a buftype, so we
     # cannot save this
-    vim.command("enew")
-    vim.command("file img://" + imageFile)
+
+    if frame == 0:
+        vim.command("bd!")
+        vim.command("enew")
+        vim.command("file img://" + imageFile)
 
     # clear the buffer
     vim.current.buffer[:] = None
+    vim.command("call clearmatches()")
 
     mycolorpalette = {}
-    matches = []
     vim.command("hi Transparent guifg=default guibg=default")
     for y in range(scaledHeight):
         asciiImage = ""
