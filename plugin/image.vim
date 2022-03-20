@@ -7,6 +7,7 @@ endif
 
 set updatetime=100
 au BufRead *.png,*.jpg,*.jpeg,*.gif :call DisplayImage()
+au VimResized *.png,*.jpg,*.jpeg,*.gif :call DisplayImage()
 au QuitPre *.png,*.jpg,*.jpeg,*.gif :call CloseImage()
 au CursorHold *.gif :call DisplayImage()
 
