@@ -29,8 +29,14 @@ def getAsciiImage(imageFile, maxWidth, maxHeight):
     except:
         exit("Cannot open image %s" % imageFile)
 
+    frame = int(vim.eval("g:image_frame"))
     if imageFile.endswith(".gif"):
-        img.seek(int(vim.eval("g:image_frame")))
+        try:
+            img.seek(frame)
+        except EOFError:
+            vim.command("let g:image_frame = 0")
+            frame = 0
+            img.seek(0)
         img = img.convert("RGBA")
 
     # We want to stretch the image a little wide to compensate for
