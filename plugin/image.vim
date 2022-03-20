@@ -53,9 +53,9 @@ def getAsciiImage(imageFile, maxWidth, maxHeight):
     # clear the buffer
     vim.current.buffer[:] = None
 
-    for y in xrange(scaledHeight):
+    for y in range(scaledHeight):
         asciiImage = ""
-        for x in xrange(scaledWidth):
+        for x in range(scaledWidth):
             rgb = pixels[x, y]
             if not isinstance(rgb, tuple):
                 rgb = (rgb,)
