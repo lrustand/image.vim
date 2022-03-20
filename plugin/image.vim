@@ -73,9 +73,9 @@ def getAsciiImage(imageFile, maxWidth, maxHeight):
     # cannot save this
 
     if frame == 0:
-        vim.command("bd!")
-        vim.command("noswapfile enew")
-        vim.command("file img://" + imageFile)
+        vim.command("noswapfile ene")
+        vim.command("bd! #")
+        vim.command("file! img://" + imageFile)
 
     # clear the buffer
     vim.current.buffer[:] = None
