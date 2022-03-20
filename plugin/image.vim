@@ -5,17 +5,19 @@ if !has("python")
     finish
 endif
 
-set updatetime=100
 au BufRead *.png,*.jpg,*.jpeg,*.gif :call DisplayImage()
 au VimResized *.png,*.jpg,*.jpeg,*.gif :call DisplayImage()
 au QuitPre *.png,*.jpg,*.jpeg,*.gif :call CloseImage()
 au CursorHold *.gif :call DisplayImage()
+au BufLeave,WinLeave *.png,*.jpg,*.jpeg,*.gif exe "set updatetime=".g:original_updatetime
 
 let g:image_frame = 0
+let g:original_updatetime = &updatetime
 function! CloseImage()
     bd!
     unlet g:imagefile
     let g:image_frame = 0
+    exe "set updatetime=".g:original_updatetime
 endfunction
 
 function! DisplayImage()
@@ -48,6 +50,8 @@ def getAsciiImage(imageFile, maxWidth, maxHeight):
             frame = 0
             img.seek(0)
         img = img.convert("RGBA")
+        if frame == 0:
+            vim.command("set updatetime=50")
 
     # We want to stretch the image a little wide to compensate for
     # the rectangular/taller shape of fonts.
