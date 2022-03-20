@@ -77,7 +77,7 @@ def getAsciiImage(imageFile, maxWidth, maxHeight):
                     vim.command("hi " + colorname + " guifg=" + rgbstring+ " guibg=" + rgbstring)
                 else:
                     colorname = mycolorpalette[rgbstring]
-            vim.command('call matchadd("' + colorname + '",' + " '\\%" + str(y + 2) + "l\\%" + str(x + 1) + "c')")
+            vim.command('call matchaddpos("' + colorname + '", [[' + str(y+2) + ", " + str(x+1) + "]])")
             asciiImage += colorPalette[int(sum(rgb) / len(rgb) / 256 * lencolor)]
         vim.current.buffer.append(asciiImage)
 
