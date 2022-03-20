@@ -5,10 +5,19 @@ if !has("python")
     finish
 endif
 
+set updatetime=100
 au BufRead *.png,*.jpg,*.jpeg,*.gif :call DisplayImage()
+au CursorHold *.gif :call DisplayImage()
+
+let g:image_frame = 0
 
 function! DisplayImage()
 set nowrap
+
+if !exists('g:imagefile')
+    let g:imagefile = expand('%:p')
+endif
+
 python << EOF
 from __future__ import division
 import vim
@@ -21,6 +30,7 @@ def getAsciiImage(imageFile, maxWidth, maxHeight):
         exit("Cannot open image %s" % imageFile)
 
     if imageFile.endswith(".gif"):
+        img.seek(int(vim.eval("g:image_frame")))
         img = img.convert("RGB")
 
     # We want to stretch the image a little wide to compensate for
@@ -52,6 +62,7 @@ def getAsciiImage(imageFile, maxWidth, maxHeight):
     # enew is safe enough since we did not specified a buftype, so we
     # cannot save this
     vim.command("enew")
+    vim.command("file img://" + imageFile)
 
     # clear the buffer
     vim.current.buffer[:] = None
@@ -84,8 +95,7 @@ def getAsciiImage(imageFile, maxWidth, maxHeight):
             asciiImage += colorPalette[int(sum(rgb) / len(rgb) / 256 * lencolor)]
         vim.current.buffer.append(asciiImage)
 
-vim.command("let imagefile = expand('%:p')")
-imagefile = vim.eval("imagefile")
+imagefile = vim.eval("g:imagefile")
 
 width = vim.current.window.width
 height = vim.current.window.height
@@ -93,4 +103,6 @@ height = vim.current.window.height
 getAsciiImage(imagefile, width, height)
 
 EOF
+
+let g:image_frame += 1
 endfunction
