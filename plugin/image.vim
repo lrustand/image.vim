@@ -5,7 +5,7 @@ if !has("python")
     finish
 endif
 
-au BufRead *.png,*.jpg,*.jpeg :call DisplayImage()
+au BufRead *.png,*.jpg,*.jpeg,*.gif :call DisplayImage()
 
 function! DisplayImage()
 set nowrap
@@ -19,6 +19,9 @@ def getAsciiImage(imageFile, maxWidth, maxHeight):
         img = Image.open(imageFile)
     except:
         exit("Cannot open image %s" % imageFile)
+
+    if imageFile.endswith(".gif"):
+        img = img.convert("RGB")
 
     # We want to stretch the image a little wide to compensate for
     # the rectangular/taller shape of fonts.
