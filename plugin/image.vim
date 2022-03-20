@@ -92,7 +92,10 @@ def getAsciiImage(imageFile, maxWidth, maxHeight):
                 else:
                     colorname = mycolorpalette[rgbstring]
             vim.command('call matchaddpos("' + colorname + '", [[' + str(y+2) + ", " + str(x+1) + "]])")
-            asciiImage += colorPalette[int(sum(rgb) / len(rgb) / 256 * lencolor)]
+            if colorname == "Transparent":
+                asciiImage += " "
+            else:
+                asciiImage += colorPalette[int(sum(rgb) / len(rgb) / 256 * lencolor)]
         vim.current.buffer.append(asciiImage)
 
 imagefile = vim.eval("g:imagefile")
