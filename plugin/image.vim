@@ -53,17 +53,28 @@ def getAsciiImage(imageFile, maxWidth, maxHeight):
     # clear the buffer
     vim.current.buffer[:] = None
 
+    mycolorpalette = {}
+    matches = []
     for y in range(scaledHeight):
         asciiImage = ""
         for x in range(scaledWidth):
             rgb = pixels[x, y]
             if not isinstance(rgb, tuple):
                 rgb = (rgb,)
+
+            rgbstring = '#%02x%02x%02x' % (rgb[0], rgb[1], rgb[2])
+            if rgbstring not in mycolorpalette:
+                rgbcolor = "RGBColor" + str(len(mycolorpalette))
+                mycolorpalette[rgbstring] = rgbcolor
+                vim.command("hi " + rgbcolor + " guifg=" + rgbstring+ " guibg=" + rgbstring)
+            else:
+                rgbcolor = mycolorpalette[rgbstring]
+            vim.command('call matchadd("' + rgbcolor + '",' + " '\\%" + str(y + 2) + "l\\%" + str(x + 1) + "c')")
             asciiImage += colorPalette[int(sum(rgb) / len(rgb) / 256 * lencolor)]
         vim.current.buffer.append(asciiImage)
 
     return asciiImage
-    
+
 vim.command("let imagefile = expand('%:p')")
 imagefile = vim.eval("imagefile")
 
