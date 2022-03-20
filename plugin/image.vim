@@ -7,9 +7,15 @@ endif
 
 set updatetime=100
 au BufRead *.png,*.jpg,*.jpeg,*.gif :call DisplayImage()
+au QuitPre *.png,*.jpg,*.jpeg,*.gif :call CloseImage()
 au CursorHold *.gif :call DisplayImage()
 
 let g:image_frame = 0
+function! CloseImage()
+    bd!
+    unlet g:imagefile
+    let g:image_frame = 0
+endfunction
 
 function! DisplayImage()
 set nowrap
