@@ -49,6 +49,8 @@ def getAsciiImage(imageFile, maxWidth, maxHeight):
     width = width * 2
 
     scale = maxWidth / width
+    if scale > 1:
+        scale = 1
     imageAspectRatio = width / height
     winAspectRatio = maxWidth / maxHeight
 
