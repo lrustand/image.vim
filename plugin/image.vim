@@ -8,7 +8,7 @@ endif
 au BufWinEnter,VimResized,WinEnter *.png,*.jpg,*.jpeg,*.gif :call DisplayImage()
 au QuitPre *.png,*.jpg,*.jpeg,*.gif :call CloseImage()
 au CursorHold *.gif :call DisplayImage()
-au BufHidden *.png,*.jpg,*.jpeg,*.gif :call ResetVars()
+au BufHidden *.png,*.jpg,*.jpeg,*.gif :call HideImage()
 au BufLeave,WinLeave *.png,*.jpg,*.jpeg,*.gif exe "set updatetime=".g:original_updatetime
 
 let g:original_updatetime = &updatetime
@@ -19,9 +19,10 @@ function! CloseImage()
     exe "set updatetime=".g:original_updatetime
 endfunction
 
-function! ResetVars()
+function! HideImage()
     call clearmatches()
     let w:image_frame = 0
+    let w:gif_paused = 1
     exe "set updatetime=".g:original_updatetime
 endfunction
 
@@ -34,6 +35,12 @@ set noswapfile
 
 if !exists('w:image_frame')
     let w:image_frame = 0
+endif
+
+if !exists('w:gif_paused')
+    let w:gif_paused = 0
+elseif w:gif_paused == 1
+    return
 endif
 
 python << EOF
@@ -76,8 +83,7 @@ def getAsciiImage(imageFile, maxWidth, maxHeight):
             vim.command("let w:image_frame = 0")
             frame = 0
             img.seek(0)
-        if frame == 0:
-            vim.command("set updatetime=50")
+        vim.command("set updatetime=50")
     img = img.convert("RGBA")
 
     # We want to stretch the image a little wide to compensate for
