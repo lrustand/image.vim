@@ -41,6 +41,26 @@ from __future__ import division
 import vim
 from PIL import Image
 
+def gethextriplet(rgb):
+    r = 17 * int(rgb[0]/16)
+    g = 17 * int(rgb[1]/16)
+    b = 17 * int(rgb[2]/16)
+    if len(rgb) > 3:
+        a = rgb[3]
+    else:
+        a = 255
+    return (r,g,b, a)
+
+def getwebsafe(rgb):
+    rw = 51 * ((int(rgb[0])+25)//51)
+    gw = 51 * ((int(rgb[1])+25)//51)
+    bw = 51 * ((int(rgb[2])+25)//51)
+    if len(rgb) > 3:
+        a = rgb[3]
+    else:
+        a = 255
+    return (rw,gw,bw, a)
+
 def getAsciiImage(imageFile, maxWidth, maxHeight):
     try:
         img = Image.open(imageFile)
@@ -56,9 +76,9 @@ def getAsciiImage(imageFile, maxWidth, maxHeight):
             vim.command("let w:image_frame = 0")
             frame = 0
             img.seek(0)
-        img = img.convert("RGBA")
         if frame == 0:
             vim.command("set updatetime=50")
+    img = img.convert("RGBA")
 
     # We want to stretch the image a little wide to compensate for
     # the rectangular/taller shape of fonts.
@@ -100,13 +120,11 @@ def getAsciiImage(imageFile, maxWidth, maxHeight):
         asciiImage = ""
         for x in range(scaledWidth):
             rgb = pixels[x, y]
-            if not isinstance(rgb, tuple):
-                rgb = (rgb,)
 
+            rgb = gethextriplet(rgb)
             alpha = 255
             if len(rgb) == 4:
                 alpha = rgb[3]
-
             if alpha == 0:
                 colorname = "Transparent"
             else:
