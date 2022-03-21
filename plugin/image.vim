@@ -90,9 +90,6 @@ def getAsciiImage(imageFile, maxWidth, maxHeight):
     # enew is safe enough since we did not specified a buftype, so we
     # cannot save this
 
-    if frame == 0:
-        vim.command("set bufhidden=wipe")
-
     # clear the buffer
     vim.current.buffer[:] = None
     vim.command("call clearmatches()")
