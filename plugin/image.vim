@@ -27,14 +27,13 @@ function! HideImage()
 endfunction
 
 function! DisplayImage()
-set nowrap
-set nonumber
-set norelativenumber
-set buftype=nofile
-set noswapfile
-
 if !exists('w:image_frame')
     let w:image_frame = 0
+    set nowrap
+    set nonumber
+    set norelativenumber
+    set buftype=nofile
+    set noswapfile
 endif
 
 if !exists('w:gif_paused')
@@ -44,28 +43,31 @@ elseif w:gif_paused == 1
 endif
 
 python << EOF
-from __future__ import division
 import vim
 from PIL import Image
 
 def gethextriplet(rgb):
-    r = 17 * int(rgb[0]/16)
-    g = 17 * int(rgb[1]/16)
-    b = 17 * int(rgb[2]/16)
     if len(rgb) > 3:
         a = rgb[3]
+        if a == 0:
+            return (0,0,0,0)
     else:
         a = 255
+    r = 17 * int(rgb[0]//16)
+    g = 17 * int(rgb[1]//16)
+    b = 17 * int(rgb[2]//16)
     return (r,g,b, a)
 
 def getwebsafe(rgb):
+    if len(rgb) > 3:
+        a = rgb[3]
+        if a == 0:
+            return (0,0,0,0)
+    else:
+        a = 255
     rw = 51 * ((int(rgb[0])+25)//51)
     gw = 51 * ((int(rgb[1])+25)//51)
     bw = 51 * ((int(rgb[2])+25)//51)
-    if len(rgb) > 3:
-        a = rgb[3]
-    else:
-        a = 255
     return (rw,gw,bw, a)
 
 def getAsciiImage(imageFile, maxWidth, maxHeight):
@@ -111,11 +113,6 @@ def getAsciiImage(imageFile, maxWidth, maxHeight):
     colorPalette = "@%#*+=-:. "
     lencolor = len(colorPalette)
 
-    # Delete the current buffer so that we dont overwrite the real image file
-    # get a new buffer
-    # enew is safe enough since we did not specified a buftype, so we
-    # cannot save this
-
     # clear the buffer
     vim.current.buffer[:] = None
     vim.command("call clearmatches()")
@@ -128,10 +125,7 @@ def getAsciiImage(imageFile, maxWidth, maxHeight):
             rgb = pixels[x, y]
 
             rgb = gethextriplet(rgb)
-            alpha = 255
-            if len(rgb) == 4:
-                alpha = rgb[3]
-            if alpha == 0:
+            if rgb[3] == 0:
                 colorname = "Transparent"
             else:
                 rgbstring = '#%02x%02x%02x' % (rgb[0], rgb[1], rgb[2])
