@@ -1,6 +1,6 @@
 command! -nargs=0 Image call DisplayImage()
 
-if !has("python")
+if !has("python3")
     echo "image.vim requires python support"
     finish
 endif
